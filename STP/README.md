@@ -16,7 +16,7 @@ This directory provides tools for generating and solving Steiner Tree Problem (S
 
 ## SCIP-Jack Setup
 
-Please refer to [SCIP-Jack](https://scipjack.zib.de/) for the installation instruction. We obtain the binary file of SCIP-Jack from [Daniel Rehfeldt](rehfeldt@zib.de). Put the binary file under this directory and specify it during the solving time.
+Please refer to [SCIP-Jack](https://scipjack.zib.de/) for the installation instruction. We obtain the binary file of SCIP-Jack from [Daniel Rehfeldt](mailto:rehfeldt@zib.de). Put the binary file under this directory and specify it during the solving time.
 
 ## Generate Training Instances
 Here is an example to generate the hypercube instances. In `generate_training_instances.py`, we also include some other generators corresponding to the instances in [OR-Library](https://people.brunel.ac.uk/~mastjjb/jeb/orlib/steininfo.html). But in general, these instances are easy to solve unless for large and dense ones. Please refer to the our curated [training set](https://huggingface.co/datasets/CO-Bench/FrontierCO-Train/tree/main/STP).
