@@ -1,0 +1,2 @@
+stp/logfile = "use_probname"
+limits/time = 3600
