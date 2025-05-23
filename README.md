@@ -1,9 +1,12 @@
 # FrontierCO: A Comprehensive Evaluation of Contemporary ML-Based Solvers for Combinatorial Optimization
 
+![image](overview.png)
 
-FrontierCO is a curated benchmark suite for evaluating ML-based solvers on large-scale and real-world Combinatorial Optimization (CO) problems. The benchmark spans 8 classical CO problems across 5 application domains, providing both training and evaluation instances specifically designed to test the frontier of ML and LLM capabilities in solving NP-hard problems.
+FrontierCO is a curated benchmark suite for evaluating ML-based solvers on large-scale and real-world Combinatorial Optimization (CO) problems. The benchmark spans 8 classical CO problems across 5 application domains, providing both training and evaluation instances specifically designed to test the contemporary ML-based CO solvers in solving NP-hard problems.
 
 Combinatorial optimization plays a fundamental role in discrete mathematics, computer science, and operations research, with applications in routing, scheduling, allocation, and more. As ML-based solvers evolve—ranging from neural networks to symbolic reasoning with large language models—FrontierCO offers the first comprehensive dataset suite tailored to test these solvers at realistic scales and difficulties.
+
+See more details about FrontierCO in our [paper](https://arxiv.org/pdf/2505.16952). Please contact shengyuf@cs.cmu.edu or weiweis@cs.cmu.edu
 
 
 # Download Data
@@ -69,5 +72,16 @@ Agents are implemented in the `agents` module. Currently supported agents includ
 Each agent implements the following functions:
 - `step()`: Returns the next candidate code for evaluation.
 
-
+# Citation
+```
+@misc{feng2025comprehensiveevaluationcontemporarymlbased,
+      title={A Comprehensive Evaluation of Contemporary ML-Based Solvers for Combinatorial Optimization}, 
+      author={Shengyu Feng and Weiwei Sun and Shanda Li and Ameet Talwalkar and Yiming Yang},
+      year={2025},
+      eprint={2505.16952},
+      archivePrefix={arXiv},
+      primaryClass={cs.LG},
+      url={https://arxiv.org/abs/2505.16952}, 
+}
+```
 
