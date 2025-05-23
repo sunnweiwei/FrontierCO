@@ -1,7 +1,7 @@
 # FrontierCO: A Comprehensive Evaluation of Contemporary ML-Based Solvers for Combinatorial Optimization
-
+<p align="center">
 <img src="overview.png" alt="Overview diagram" width="50%" />
-
+</p>
 FrontierCO is a curated benchmark suite for evaluating ML-based solvers on large-scale and real-world Combinatorial Optimization (CO) problems. The benchmark spans 8 classical CO problems across 5 application domains, providing both training and evaluation instances specifically designed to test the contemporary ML-based CO solvers in solving NP-hard problems.
 
 Combinatorial optimization plays a fundamental role in discrete mathematics, computer science, and operations research, with applications in routing, scheduling, allocation, and more. As ML-based solvers evolve—ranging from neural networks to symbolic reasoning with large language models—FrontierCO offers the first comprehensive dataset suite tailored to test these solvers at realistic scales and difficulties.
