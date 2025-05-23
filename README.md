@@ -6,7 +6,7 @@ FrontierCO is a curated benchmark suite for evaluating ML-based solvers on large
 
 Combinatorial optimization plays a fundamental role in discrete mathematics, computer science, and operations research, with applications in routing, scheduling, allocation, and more. As ML-based solvers evolve—ranging from neural networks to symbolic reasoning with large language models—FrontierCO offers the first comprehensive dataset suite tailored to test these solvers at realistic scales and difficulties.
 
-See more details about FrontierCO in our [paper](https://arxiv.org/pdf/2505.16952). Please contact shengyuf@cs.cmu.edu or weiweis@cs.cmu.edu
+See more details about FrontierCO in our [paper](https://arxiv.org/pdf/2505.16952). Please contact shengyuf@cs.cmu.edu or weiweis@cs.cmu.edu.
 
 
 # Download Data
