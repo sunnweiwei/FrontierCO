@@ -30,25 +30,36 @@ Please refer to the instructions under each problem folder for how to:
 
 All the neural solvers evaluated in this work are open-sourced models. Please refer to their official GitHub repos for the training and evaluation code.
 
+# Neural Solver Evaluation
+
+TBD
 
 # Agent Evaluation
+
+Check out [Evaluation-on-Frontierco](https://github.com/sunnweiwei/CO-Bench?tab=readme-ov-file#evaluation-on-frontierco)
+
 Below is code to run evaluation of *Greedy Refinement* agent on `CFLP` for 64 iterations with 300s timeout.
 
 ```python
-from agents import GreedyRefine, DirectAnswer, FunSearch, AIDE, ChainOfExperts, ReEvo, BestOfN
-from evaluation import YieldingEvaluator, get_data
+# We use new agent implementations in FrontierCO:
+from agents import YieldGreedyRefine, YieldFunSearch, YieldReEvo
+
+# And a new evaluator to fetch solutions yielded by the solver,
+# evaluating only the last solution before timeout:
+from evaluation import YieldingEvaluator, get_new_data
 
 # Load data
-data = get_data('CFLP', src_dir='data')
+data = get_new_data(task, src_dir='data', data_dir='data')
 
-# Define agent, here we use GreedyRefine
-agent = GreedyRefine(
+# Define agent (example: YieldGreedyRefine)
+agent = YieldGreedyRefine(
     problem_description=data.problem_description,
-    timeout=300,
-    model='openai/o3-mini', # We use LiteLLM to call API
+    timeout=300,  # 300s timeout during solver development
+    model='openai/o3-mini',  # We use LiteLLM to call the API
 )
 
-# Load evaluator
+# Load YieldingEvaluator
+# 300s timeout during solver development
 evaluator = YieldingEvaluator(data, timeout=300)
 
 # Run for 64 iterations
@@ -61,7 +72,10 @@ for it in range(64):
 
 # Get the final solution
 code = agent.finalize()
-feedback = evaluator.evaluate(code)
+
+# For final evaluation, run the solver for 1 hour
+final_evaluator = YieldingEvaluator(data, timeout=60 * 60)
+feedback = final_evaluator.evaluate(code)
 print(feedback.test_feedback)  # Test set score
 ```
 
