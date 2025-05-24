@@ -32,11 +32,16 @@ def solve(**kwargs):
          'assignments': (list of list of float) A 2D list (m x n) where each entry represents the amount of customer i's demand supplied by facility j.
     """
     ## placeholder. You do not need to write anything here.
-    return {
-        "total_cost": 0.0,
-        "facilities_open": [0] * kwargs["n"],
-        "assignments": [[0.0] * kwargs["n"] for _ in range(kwargs["m"])]
-    }
+    # Your function must yield multiple solutions over time, not just return one solution
+    # Use Python's yield keyword repeatedly to produce a stream of solutions
+    # Each yielded solution should be better than the previous one
+    while True:
+        yield {
+            "total_cost": 0.0,
+            "facilities_open": [0] * kwargs["n"],
+            "assignments": [[0.0] * kwargs["n"] for _ in range(kwargs["m"])]
+        }
+
 
 def load_data(input_path):
     """Read Capacitated Facility Location Problem instance from a file.
@@ -54,19 +59,19 @@ def load_data(input_path):
     cn1, cn2, cn3, ..., cnm
     """
     # Read all numbers from the file
-    with open(filename, 'r') as f:
+    with open(input_path, 'r') as f:
         content = f.read()
         # Extract all numbers, ignoring whitespace and empty lines
         all_numbers = [num for num in content.split() if num.strip()]
-        
+
     pos = 0  # Position in the numbers list
-    
+
     # Parse dimensions: n (facilities), m (customers)
     n = int(all_numbers[pos])
     pos += 1
     m = int(all_numbers[pos])
     pos += 1
-    
+
     # Parse facility data: capacity, fixed cost
     capacities = []
     fixed_costs = []
@@ -76,14 +81,14 @@ def load_data(input_path):
             pos += 1
             fixed_costs.append(float(all_numbers[pos]))
             pos += 1
-    
+
     # Parse customer demands
     demands = []
     for _ in range(m):
         if pos < len(all_numbers):
             demands.append(float(all_numbers[pos]))
             pos += 1
-    
+
     # Parse transportation costs
     trans_costs = []
     for _ in range(n):
@@ -93,15 +98,16 @@ def load_data(input_path):
                 facility_costs.append(float(all_numbers[pos]))
                 pos += 1
         trans_costs.append(facility_costs)
-    
+
     # Verify that we have the expected amount of data
-    expected_numbers = 2 + 2*n + m + n*m
+    expected_numbers = 2 + 2 * n + m + n * m
     if len(all_numbers) < expected_numbers:
         print(f"Warning: File might be incomplete. Expected {expected_numbers} numbers, found {len(all_numbers)}.")
 
-    case = {"n": m, "m": m, "capacities": capacities "fixed_cost": fixed_cost, "demands": demands, 'trans_costs', trans_costs}
+    case = {"n": m, "m": m, "capacities": capacities, "fixed_cost": fixed_costs, "demands": demands,
+            'trans_costs': trans_costs}
 
-    return case
+    return [case]
 
 
 def eval_func(n, m, capacities, fixed_cost, demands, trans_costs, facilities_open, assignments, **kwargs):
@@ -188,3 +194,25 @@ def eval_func(n, m, capacities, fixed_cost, demands, trans_costs, facilities_ope
             )
 
     return computed_total_cost
+
+
+def norm_score(results):
+    optimal_scores = {'easy_test_instances/i1000_10.plc': [27186.996215], 'easy_test_instances/i1000_1.plc': [49509.816283], 'easy_test_instances/i1000_11.plc': [22180.338324], 'easy_test_instances/i1000_13.plc': [22648.245244], 'easy_test_instances/i1000_17.plc': [21188.891031], 'easy_test_instances/i1000_14.plc': [22312.017885], 'easy_test_instances/i1000_18.plc': [20713.433821], 'easy_test_instances/i1000_16.plc': [21331.816412], 'easy_test_instances/i1000_15.plc': [22627.627082], 'easy_test_instances/i1000_19.plc': [20537.451973], 'easy_test_instances/i1000_12.plc': [22160.396492], 'easy_test_instances/i1000_20.plc': [21560.863859], 'easy_test_instances/i1000_3.plc': [47202.64124], 'easy_test_instances/i1000_5.plc': [50743.542247], 'easy_test_instances/i1000_2.plc': [50688.099361], 'easy_test_instances/i1000_6.plc': [27823.848194], 'easy_test_instances/i1000_4.plc': [48868.545165], 'easy_test_instances/i1000_7.plc': [27252.327368], 'easy_test_instances/i1000_9.plc': [26857.093992], 'easy_test_instances/i1000_8.plc': [27375.377404]}
+    optimal_scores = optimal_scores | {'hard_test_instances/p2000-2000-34.plc': [1916455.670809467], 'hard_test_instances/p2000-2000-39.plc': [1153261.587371967], 'hard_test_instances/p2000-2000-36.plc': [1139219.595105013], 'hard_test_instances/p2000-2000-32.plc': [1953642.449903901], 'hard_test_instances/p2000-2000-33.plc': [1918045.972964212], 'hard_test_instances/p2000-2000-37.plc': [1136995.540252458], 'hard_test_instances/p2000-2000-31.plc': [1929201.669659948], 'hard_test_instances/p2000-2000-38.plc': [1149261.691855482], 'hard_test_instances/p2000-2000-35.plc': [1899636.376243865], 'hard_test_instances/p2000-2000-40.plc': [1154591.397009221], 'hard_test_instances/p2000-2000-41.plc': [751876.874001226], 'hard_test_instances/p2000-2000-42.plc': [749780.77133064], 'hard_test_instances/p2000-2000-43.plc': [763162.335598751], 'hard_test_instances/p2000-2000-44.plc': [787097.341066275], 'hard_test_instances/p2000-2000-45.plc': [762175.878180943], 'hard_test_instances/p2000-2000-46.plc': [281246.845669752], 'hard_test_instances/p2000-2000-47.plc': [272707.740258233], 'hard_test_instances/p2000-2000-49.plc': [274280.626885327], 'hard_test_instances/p2000-2000-48.plc': [276216.104935007], 'hard_test_instances/p2000-2000-50.plc': [274298.079036553], 'hard_test_instances/p2000-2000-58.plc': [158310.511106569], 'hard_test_instances/p2000-2000-57.plc': [157319.490628803], 'hard_test_instances/p2000-2000-51.plc': [194138.93227269], 'hard_test_instances/p2000-2000-60.plc': [155528.26183311], 'hard_test_instances/p2000-2000-56.plc': [161350.609996602], 'hard_test_instances/p2000-2000-59.plc': [158712.647978297], 'hard_test_instances/p2000-2000-52.plc': [194518.3], 'hard_test_instances/p2000-2000-53.plc': [195329.6], 'hard_test_instances/p2000-2000-54.plc': [198441.2], 'hard_test_instances/p2000-2000-55.plc': [196469.246795541]}
+    optimal_scores = optimal_scores | {'valid_instances/cflp_corn_n100_m100_r5.0_11.txt': [17769.328224917], 'valid_instances/cflp_corn_n100_m100_r5.0_18.txt': [17840.680486713], 'valid_instances/cflp_corn_n100_m100_r5.0_19.txt': [16677.981827268], 'valid_instances/cflp_corn_n100_m100_r5.0_17.txt': [17536.698901833], 'valid_instances/cflp_corn_n100_m100_r5.0_1.txt': [17769.059032386], 'valid_instances/cflp_corn_n100_m100_r5.0_4.txt': [18555.250515996], 'valid_instances/cflp_corn_n100_m100_r5.0_15.txt': [17787.11820802], 'valid_instances/cflp_corn_n100_m100_r5.0_2.txt': [17458.209008233], 'valid_instances/cflp_corn_n100_m100_r5.0_3.txt': [18172.936618284], 'valid_instances/cflp_corn_n100_m100_r5.0_7.txt': [17305.736933955], 'valid_instances/cflp_corn_n100_m100_r5.0_10.txt': [18264.241302152], 'valid_instances/cflp_corn_n100_m100_r5.0_9.txt': [16846.038360034], 'valid_instances/cflp_corn_n100_m100_r5.0_20.txt': [18174.252379047], 'valid_instances/cflp_corn_n100_m100_r5.0_6.txt': [17316.344512835], 'valid_instances/cflp_corn_n100_m100_r5.0_5.txt': [17202.336476137], 'valid_instances/cflp_corn_n100_m100_r5.0_13.txt': [18670.213542081], 'valid_instances/cflp_corn_n100_m100_r5.0_16.txt': [18594.255562191], 'valid_instances/cflp_corn_n100_m100_r5.0_8.txt': [16122.550826763], 'valid_instances/cflp_corn_n100_m100_r5.0_12.txt': [18496.120911648], 'valid_instances/cflp_corn_n100_m100_r5.0_14.txt': [18890.400869194]}
+
+    normed = {}
+    for case, (scores, error_message) in results.items():
+        if case not in optimal_scores:
+            continue  # Skip if there's no optimal score defined.
+        optimal_list = optimal_scores[case]
+        normed_scores = []
+        # Compute normalized score for each index.
+        for idx, score in enumerate(scores):
+            if isinstance(score, (int, float)):
+                normed_scores.append(1 - abs(score - optimal_list[idx]) / max(score, optimal_list[idx]))
+            else:
+                normed_scores.append(score)
+        normed[case] = (normed_scores, error_message)
+
+    return normed

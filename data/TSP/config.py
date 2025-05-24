@@ -14,60 +14,68 @@ def solve(**kwargs):
             - 'tour' (list): List of node indices representing the solution path
                             Format: [0, 3, 1, ...] where numbers are indices into the nodes list
     """
+    # Your function must yield multiple solutions over time, not just return one solution
+    # Use Python's yield keyword repeatedly to produce a stream of solutions
+    # Each yielded solution should be better than the previous one
+    # Evaluation is on the last yielded solution before timeout
+    while True:
+        yield {
+            'tour': [],
+        }
 
-    return {
-        'tour': [],
-    }
 
 
-def load_data(file_path):
-    """
-    Load TSP instances from a file.
 
-    Args:
-        file_path (str): Path to the file containing TSP instances
 
-    Returns:
-        list: List of dictionaries, each containing a TSP instance with:
-            - 'nodes': List of (x, y) coordinates
-            - 'tour': List of node indices representing the optimal tour (if available)
-    """
-    instances = []
-    with open(file_path, "r") as f:
+def load_data(filepath):
+    import re
+    nodes = []
+    dimension = 0
+    reading_nodes = False
+
+    with open(filepath, 'r') as f:
         for line in f:
-            line = line.split(" ")
-            try:
-                output_idx = line.index('output')
-                num_nodes = output_idx // 2
+            line = line.strip()
 
-                # Extract node coordinates
-                nodes = [(float(line[i]), float(line[i + 1])) for i in range(0, 2 * num_nodes, 2)]
+            # Extract dimension if present
+            if line.startswith("DIMENSION"):
+                dimension = int(line.split(":")[1].strip())
 
-                # Extract tour (if available)
-                tour = None
-                if output_idx < len(line) - 1:
-                    # Convert tour nodes to 0-indexed and exclude the final node (which is the same as the first)
-                    tour = [int(node) - 1 for node in line[output_idx + 1:-1]][:-1]
+            # Check if we're at the node coordinates section
+            elif line == "NODE_COORD_SECTION":
+                reading_nodes = True
 
-                instances.append({
-                    'nodes': nodes,
-                    'label_tour': tour
-                })
-            except (ValueError, IndexError) as e:
-                print(f"Error processing line: {e}")
-                continue
-    return instances
+            # End of node coordinates section
+            elif line == "EOF":
+                reading_nodes = False
+
+            # Read node coordinates
+            elif reading_nodes and line:
+                # TSP format typically has: index x_coord y_coord
+                parts = re.split(r'\s+', line.strip())
+                if len(parts) >= 3:  # Make sure we have at least index, x, y
+                    try:
+                        # Skip the index (parts[0])
+                        x, y = float(parts[1]), float(parts[2])
+                        nodes.append([x, y])
+                    except ValueError:
+                        continue  # Skip lines that can't be parsed properly
+
+    # Verify that we got the expected number of nodes
+    if dimension > 0 and len(nodes) != dimension:
+        print(f"Warning: Expected {dimension} nodes but found {len(nodes)}")
+
+    # Convert to tensor
+    return [{'nodes': nodes}]
 
 
-def eval_func(nodes, label_tour, tour):
+def eval_func(nodes, tour):
     """
     Evaluate a predicted TSP tour against a reference tour.
 
     Args:
         nodes (list): List of (x, y) coordinates representing cities in the TSP problem
                      Format: [(x1, y1), (x2, y2), ..., (xn, yn)]
-        label_tour (list): Reference/optimal tour as list of node indices
-                          Format: [0, 3, 1, ...] (may be None if no reference available)
         tour (list): Predicted tour from the solver as list of node indices
                          Format: [0, 3, 1, ...]
 
@@ -112,72 +120,9 @@ def eval_func(nodes, label_tour, tour):
 
 
 def norm_score(results):
-    optimal_scores = {
-        'tsp10000_test_concorde.txt': [71.77] * 16,
-        'tsp1000_test_concorde.txt': [23.180520881091528, 23.185595820967464, 23.015849671324247, 23.537607117355098,
-                                      23.437452128607738, 23.31718378127829, 23.337815853824736, 22.98403971254625,
-                                      23.056714372610298, 23.344826856094013, 23.204461510197465, 22.739131293587075,
-                                      23.188355412394525, 22.89676721383878, 23.321213972552503, 23.288168535452023,
-                                      23.40260594371496, 23.379338976209613, 23.373901670260118, 23.217316627245133,
-                                      23.237964507712658, 23.468791280324233, 22.921856962988343, 23.10809259424775,
-                                      23.370845238521724, 23.241556219224208, 23.348641855759727, 23.53455701244874,
-                                      23.385399569524708, 23.324316152061755, 23.600128423871258, 22.97776918106818,
-                                      23.23996887566731, 23.39944035075775, 23.21410580402093, 23.093180229981513,
-                                      23.41235476581497, 22.907788976836535, 23.023973448563986, 23.38106742108426,
-                                      23.015367118079723, 22.610650093362192, 23.728111421819854, 23.31046641124744,
-                                      23.25381246570274, 22.889579599261864, 23.138723098665373, 23.228706227395723,
-                                      23.420741250703944, 23.255723604641904, 23.63211466330456, 23.03074201227862,
-                                      23.08458884685017, 23.241154659459145, 23.445330799785832, 23.315728497380498,
-                                      23.262087203582375, 23.43107533587823, 23.020824065107902, 23.591574572456,
-                                      23.01019854749962, 23.006394524552746, 23.117390281951273, 23.06132560795126,
-                                      22.899650785646813, 23.17319516968116, 23.229133743009296, 23.187607300641957,
-                                      22.83150095703399, 23.158901255572648, 23.298349320155108, 23.364983773246387,
-                                      23.265256805650658, 23.73268837357109, 23.07144480109362, 23.202894990560697,
-                                      23.34293044019312, 23.027139320724427, 23.005485112127072, 23.16783838686215,
-                                      23.505726302417372, 23.002594549857108, 23.50388356372942, 23.147934207287026,
-                                      23.149537479144914, 23.20934617772166, 23.591015529376406, 23.04614917635098,
-                                      23.253196613627406, 23.608716670166032, 23.313874804840438, 23.14887954791675,
-                                      23.261925104915175, 23.283273388936596, 22.869470302805432, 23.28919260955595,
-                                      23.291061784892037, 23.26303190269252, 23.43192602385145, 22.992654709729297,
-                                      23.53527899384453, 23.040088044723632, 23.165752550718327, 23.346603825959306,
-                                      23.21040140495141, 23.346553301777227, 23.192654754892565, 23.30425312678073,
-                                      23.03197099577737, 23.33672313379179, 23.209507048094107, 23.33316267340018,
-                                      22.832592819311447, 23.47921422142005, 23.29841589882617, 22.79469376239716,
-                                      23.437580101042798, 22.90129840984213, 23.377778449705787, 23.152730269355438,
-                                      23.179248710299515, 23.150584655373375, 23.303559153530237, 23.567343754278223,
-                                      23.14174465613352, 23.236813383632978, 23.178718844944385, 23.114735241004848],
-        'tsp500_test_concorde.txt': [16.43849479258626, 16.30760609977988, 16.55368794754589, 17.0916769200107,
-                                     16.358815620695264, 16.355575136034258, 16.468449176999673, 16.547487678806803,
-                                     16.624118787814286, 16.875851583784797, 16.584382768436186, 16.775629024699168,
-                                     16.625112093123217, 16.537041048883633, 16.211908886171635, 16.507889182815646,
-                                     16.443711824038594, 16.772997858965947, 16.576148488026003, 16.644182889540385,
-                                     16.83104599989968, 16.798687309323867, 16.64786310345603, 16.68678554471238,
-                                     16.539765290816586, 16.158516162147357, 16.750957469266986, 16.454327423569975,
-                                     16.437695592935125, 16.47266324558099, 16.5807314540603, 16.640030608011333,
-                                     16.717644006541413, 16.538629003657803, 16.73424552661684, 16.702691981178777,
-                                     16.4488503948912, 16.65158792760706, 16.21441667652796, 16.58894596771913,
-                                     16.62425057027662, 16.411010231382186, 16.4198250548815, 16.880314028063836,
-                                     16.654445215349824, 16.6703557900618, 16.811423319096434, 16.681548608331166,
-                                     16.40538961977731, 16.375709814617032, 16.4755439381876, 16.352299703304702,
-                                     16.358345088111275, 16.446260979610017, 16.479360821405024, 16.664705227172075,
-                                     16.514514381377964, 16.703418138718607, 16.501081465067912, 16.758043371686597,
-                                     16.529838521968927, 16.331302381910483, 16.769035549248624, 16.667247187672565,
-                                     16.457565298893492, 16.649335805699657, 16.82614018506712, 16.938244810751787,
-                                     16.7896287123959, 16.45162524049444, 16.60657770837926, 16.752028686357416,
-                                     16.538134167181376, 16.419856051838476, 17.056640374302344, 16.763628081715684,
-                                     16.76853264913112, 16.94949524434479, 16.57562195411809, 16.665389374714852,
-                                     16.690740743946513, 16.405456340497622, 16.442597689610583, 16.801813848508267,
-                                     16.670030108101063, 16.62938726279957, 16.23649751271661, 16.69571793825944,
-                                     16.587558708667046, 16.32450912204972, 16.270614173517753, 16.75899873051874,
-                                     16.803321805550524, 16.3602825442514, 16.58252109177151, 16.450516009703893,
-                                     16.35900041167487, 16.637551343677693, 16.572893477964705, 16.73275661200808,
-                                     16.541081653324518, 16.466516697851265, 17.021310751236744, 16.536183906712942,
-                                     16.77678089186245, 16.35713000043851, 16.3183776670553, 16.68224023564231,
-                                     16.672341313126555, 16.607714934366197, 16.634734868495503, 16.674511551735357,
-                                     16.414641537953482, 16.849240225161548, 16.74452644717401, 16.50467692427514,
-                                     16.93072503233582, 16.38341557967758, 16.610910144984917, 16.589115661773096,
-                                     16.366818207481515, 16.599226446198887, 16.349609487246365, 16.38083156520364,
-                                     16.732343248542644, 16.615639804768033, 16.603236295079725, 16.12821378820771]}
+    optimal_scores = {'valid_instances/E1k.0': [23360648.0], 'valid_instances/E1k.1': [22985695.0], 'valid_instances/E1k.2': [23023351.0], 'valid_instances/E1k.3': [23149856.0], 'valid_instances/E1k.4': [22698717.0], 'valid_instances/E1k.5': [23192391.0], 'valid_instances/E1k.6': [23349803.0], 'valid_instances/E1k.7': [22882343.0], 'valid_instances/E1k.8': [23027023.0], 'valid_instances/E1k.9': [23356256.0]}
+    optimal_scores = optimal_scores | {'hard_test_instances/C100k.0': [104617752.0], 'hard_test_instances/C100k.1': [105390777.0], 'hard_test_instances/C10k.0': [33001034.0], 'hard_test_instances/C10k.1': [33186248.0], 'hard_test_instances/C10k.2': [33155424.0], 'hard_test_instances/C316k.0': [186870839.0], 'hard_test_instances/C31k.0': [59545390.0], 'hard_test_instances/C31k.1': [59293266.0], 'hard_test_instances/E100k.0': [225784127.0], 'hard_test_instances/E100k.1': [225654639.0], 'hard_test_instances/E10M.0': [2253040346.0], 'hard_test_instances/E10k.0': [71865826.0], 'hard_test_instances/E10k.1': [72031630.0], 'hard_test_instances/E10k.2': [71822483.0], 'hard_test_instances/E1M.0': [713187688.0], 'hard_test_instances/E316k.0': [401301206.0], 'hard_test_instances/E31k.0': [127282138.0], 'hard_test_instances/E31k.1': [127452384.0], 'hard_test_instances/E3M.0': [1267295473.0]}
+    optimal_scores = optimal_scores | {'easy_test_instances/brd14051.tsp': [469385.0], 'easy_test_instances/d1291.tsp': [50801.0], 'easy_test_instances/d15112.tsp': [1573084.0], 'easy_test_instances/d1655.tsp': [62128.0], 'easy_test_instances/d18512.tsp': [645238.0], 'easy_test_instances/d2103.tsp': [80450.0], 'easy_test_instances/fl1400.tsp': [20127.0], 'easy_test_instances/fl1577.tsp': [22249.0], 'easy_test_instances/fl3795.tsp': [28772.0], 'easy_test_instances/fnl4461.tsp': [182566.0], 'easy_test_instances/nrw1379.tsp': [56638.0], 'easy_test_instances/pcb1173.tsp': [56892.0], 'easy_test_instances/pcb3038.tsp': [137694.0], 'easy_test_instances/pr1002.tsp': [259045.0], 'easy_test_instances/pr2392.tsp': [378032.0], 'easy_test_instances/rl11849.tsp': [923288.0], 'easy_test_instances/rl1304.tsp': [252948.0], 'easy_test_instances/rl1323.tsp': [270199.0], 'easy_test_instances/rl1889.tsp': [316536.0], 'easy_test_instances/rl5915.tsp': [565530.0], 'easy_test_instances/rl5934.tsp': [556045.0], 'easy_test_instances/u1060.tsp': [224094.0], 'easy_test_instances/u1432.tsp': [152970.0], 'easy_test_instances/u1817.tsp': [57201.0], 'easy_test_instances/u2152.tsp': [64253.0], 'easy_test_instances/u2319.tsp': [234256.0], 'easy_test_instances/usa13509.tsp': [19982859.0], 'easy_test_instances/vm1084.tsp': [239297.0], 'easy_test_instances/vm1748.tsp': [336556.0]}
     normed = {}
     for case, (scores, error_message) in results.items():
         if case not in optimal_scores:
@@ -187,11 +132,9 @@ def norm_score(results):
         # Compute normalized score for each index.
         for idx, score in enumerate(scores):
             if isinstance(score, (int, float)):
-                normed_scores.append(optimal_list[idx] / score)
+                normed_scores.append(1 - abs(score - optimal_list[idx]) / max(score, optimal_list[idx]))
             else:
                 normed_scores.append(score)
         normed[case] = (normed_scores, error_message)
 
     return normed
-
-
