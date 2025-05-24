@@ -32,7 +32,7 @@ All the neural solvers evaluated in this work are open-sourced models. Please re
 
 # Neural Solver Evaluation
 
-TBD
+
 
 # Agent Evaluation
 
