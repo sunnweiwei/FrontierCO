@@ -23,7 +23,7 @@ snapshot_download(
 
 # Classical Solvers and Neural Training Data
 
-Please refer to the instructions under each problem folder for how to: 
+Please refer to the instructions under each problem folder under [data](https://github.com/sunnweiwei/FrontierCO/tree/main/data) for how to: 
 
 - apply the human-designed classical solvers 
 - generate the training data for neural solvers 
