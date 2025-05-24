@@ -1,0 +1,43 @@
+name: Dependabot Auto-Merge
+
+on:
+  pull_request:
+    branches: [ main ]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  dependabot-auto-merge:
+    runs-on: ubuntu-latest
+    if: ${{ github.actor == 'dependabot[bot]' }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Dependabot metadata
+        id: metadata
+        uses: dependabot/fetch-metadata@v1
+        with:
+          github-token: "${{ secrets.GITHUB_TOKEN }}"
+
+      # Run tests - this is a placeholder that should be replaced with your actual test command
+      - name: Run tests
+        run: |
+          # Add your test commands here
+          # For example:
+          # npm test
+          # or
+          # python -m pytest
+          echo "Running tests..."
+          # This is a placeholder. The workflow will proceed as if tests passed.
+          # Replace this with your actual test command.
+
+      - name: Auto-merge Dependabot PRs
+        if: ${{ steps.metadata.outputs.update-type != 'version-update:semver-major' }}
+        run: |
+          gh pr merge --auto --merge "$PR_URL"
+        env:
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
