@@ -28,11 +28,9 @@ Please refer to the instructions under each problem folder under [data](https://
 - apply the human-designed classical solvers 
 - generate the training data for neural solvers 
 
-All the neural solvers evaluated in this work are open-sourced models. Please refer to their official GitHub repos for the training and evaluation code.
-
 # Neural Solver Evaluation
 
-
+All the neural solvers evaluated in this work are open-sourced models. Please refer to their official GitHub repos for the training and evaluation code.
 
 # Agent Evaluation
 
