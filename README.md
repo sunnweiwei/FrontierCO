@@ -34,8 +34,10 @@ All the neural solvers evaluated in this work are open-sourced models. Please re
 
 # Agent Evaluation
 
-Check out [Evaluation-on-Frontierco](https://github.com/sunnweiwei/CO-Bench?tab=readme-ov-file#evaluation-on-frontierco)
+Check out the latest code at [Evaluation-on-Frontierco](https://github.com/sunnweiwei/CO-Bench?tab=readme-ov-file#evaluation-on-frontierco)
 
+<details>
+<summary>Example</summary>
 Below is code to run evaluation of *Greedy Refinement* agent on `CFLP` for 64 iterations with 300s timeout.
 
 ```python
@@ -83,6 +85,7 @@ Agents are implemented in the `agents` module. Currently supported agents includ
 
 Each agent implements the following functions:
 - `step()`: Returns the next candidate code for evaluation.
+</details>
 
 # Citation
 ```
